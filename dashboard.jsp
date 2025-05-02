@@ -1,39 +1,50 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page import="java.util.*, model.courses" %>
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Course Dashboard</title>
-</head>
+<head><title>Dashboard</title></head>
 <body>
-    <h1>Welcome, ${username}!</h1>
-    <a href="LogoutServlet">Logout</a>
-    
-    <h2>Available Courses</h2>
-    <table border="1">
-        <tr>
-            <th>Course ID</th>
-            <th>Course Name</th>
-            <th>Instructor</th>
-            <th>Action</th>
-        </tr>
-        <%-- Will be populated by DashboardServlet --%>
-        <c:forEach items="${courses}" var="course">
-            <tr>
-                <td>${course.id}</td>
-                <td>${course.name}</td>
-                <td>${course.instructor}</td>
-                <td><a href="EnrollServlet?courseId=${course.id}">Enroll</a></td>
-            </tr>
-        </c:forEach>
-    </table>
 
-    <h2>Your Enrolled Courses</h2>
-    <ul>
-        <%-- Will display enrolled courses from session --%>
-        <c:forEach items="${enrolledCourses}" var="course">
-            <li>${course.name} (${course.id})</li>
-        </c:forEach>
-    </ul>
+<h2>Welcome to Dashboard</h2>
+
+<% if (request.getAttribute("message") != null) { %>
+    <p style="color: green;"><%= request.getAttribute("message") %></p>
+<% } %>
+
+<h3>Available Courses</h3>
+<table border="1">
+<tr><th>ID</th><th>Name</th><th>Instructor</th><th>Action</th></tr>
+<%
+    List<courses> courses = (List<courses>) request.getAttribute("courseList");
+    for (courses course : courses) {
+%>
+<tr>
+    <td><%= course.getCourseId() %></td>
+    <td><%= course.getCourseName() %></td>
+    <td><%= course.getInstructor() %></td>
+    <td><a href="enroll?courseId=<%= course.getCourseId() %>">Enroll</a></td>
+</tr>
+<% } %>
+</table>
+
+<h3>Enrolled Courses</h3>
+<%
+    List<courses> enrolled = (List<courses>) request.getAttribute("enrolledCourses");
+    if (enrolled != null && !enrolled.isEmpty()) {
+%>
+<table border="1">
+<tr><th>ID</th><th>Name</th><th>Instructor</th></tr>
+<% for (courses c : enrolled) { %>
+<tr>
+    <td><%= c.getCourseId() %></td>
+    <td><%= c.getCourseName() %></td>
+    <td><%= c.getInstructor() %></td>
+</tr>
+<% } %>
+</table>
+<% } else { %>
+<p>No enrolled courses yet.</p>
+<% } %>
+
+<br><a href="logout">Logout</a>
 </body>
 </html>
